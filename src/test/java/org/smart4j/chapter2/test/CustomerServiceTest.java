@@ -3,12 +3,21 @@ package org.smart4j.chapter2.test;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.smart4j.chapter1.helper.DatabaseHelper;
 import org.smart4j.chapter1.model.Customer;
 import org.smart4j.chapter1.service.CustomerService;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class CustomerServiceTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(CustomerServiceTest.class);
 
     private final CustomerService customerService;
 
@@ -17,8 +26,9 @@ public class CustomerServiceTest {
     }
 
     @Before
-    public void init(){
+    public void init() throws IOException {
 
+        executeSqlFile("sql/customer_init.sql");
     }
 
     @Test
@@ -27,7 +37,7 @@ public class CustomerServiceTest {
         for (Customer customer:customerList) {
             System.out.println(customer);
         }
-        Assert.assertEquals(2,customerList.size());
+        Assert.assertEquals(0,customerList.size());
 
     }
 
@@ -80,6 +90,11 @@ public class CustomerServiceTest {
         String name = "22-222-22";
         String char1 = name.substring(name.indexOf('-')+1,name.lastIndexOf('-'));
         System.out.print(char1);
+        String str = "{\n" +
+                "\t\"text\": \"MXCHIP won a prize\",\n" +
+                "\t\"id\": 1234,\n" +
+                "\t\"focus\": \"Internet of Things\"\n" +
+                "}";
 
 //        StringBuilder values = new StringBuilder("(?,?,?,?,?,?,?,");
 //        StringBuilder name =  values.replace(values.lastIndexOf(","),values.length(),")");
@@ -90,6 +105,20 @@ public class CustomerServiceTest {
 //        System.out.println(aaa.lastIndexOf("a"));
 //        System.out.print(aaa.replace(2,4,"b"));
 
+    }
+
+    public static void executeSqlFile(String filePath){
+        InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(filePath);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        try{
+            String sql;
+            while((sql = reader.readLine()) != null){
+                DatabaseHelper.executeUpdate(sql);
+            }
+        }catch (Exception e){
+            logger.error("execute sql file failure",e);
+            throw new RuntimeException(e);
+        }
     }
 
 }

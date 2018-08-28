@@ -231,7 +231,7 @@ public class DatabaseHelper {
      * @return
      */
     public static <T> boolean deleteEntity(Class<T> entityClass,String id){
-        String sql = "DELETE FROM" + getTableName(entityClass) + "WHERE id = ?";
+        String sql = "DELETE FROM " + getTableName(entityClass) + " WHERE id = ?";
         return executeUpdate(sql,id) == 1;
     }
 
